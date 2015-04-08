@@ -1,4 +1,4 @@
-=== 2BC Image Gallery ===
+=== 2BC Form Security ===
 Contributors: 2bc_jason, 2bc_aron
 Donate link: http://2bcoding.com/donate-to-2bcoding/
 Tags: 2bc, 2bcoding, google, recaptcha, google recaptcha, captcha, integration, honeypot, spam, security, statistics, form, forms, login, registration, comments
