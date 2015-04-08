@@ -55,7 +55,7 @@ The *2BC Form Security* can be installed via the WordPress plugin repository (au
 
 = Manual =
 
-1. [Download a copy of the plugin](https://wordpress.org/plugins/2bc-image-gallery/) and save it to the local computer.  Make sure that the folder has been unzipped.
+1. [Download a copy of the plugin](https://wordpress.org/plugins/2bc-form-security/) and save it to the local computer.  Make sure that the folder has been unzipped.
 2. [Using an FTP program or cPanel](https://codex.wordpress.org/FTP_Clients), connect to the server that is hosting the website
 3. Find the root folder for the site and browse to the following directories: **wp-content** > **plugins**
 4. Upload the un-compressed *2bc-form-security* folder in to the *plugins* folder on the server
