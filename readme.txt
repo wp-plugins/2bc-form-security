@@ -42,13 +42,13 @@ The [2BC Form Security documentation page](http://2bcoding.com/plugins/2bc-form-
 
 == Installation ==
 
-The *2BC Image Gallery* can be installed via the WordPress plugin repository (automatic), or by uploading the files directly to the web server (manual).
+The *2BC Form Security* can be installed via the WordPress plugin repository (automatic), or by uploading the files directly to the web server (manual).
 
 = Automatic =
 
 1. [Log in to the WordPress administration panel](https://codex.wordpress.org/First_Steps_With_WordPress#Log_In) with an administrator account
 2. Click **Plugins** > **Add New**
-3. Search for *2BC Image Gallery*
+3. Search for *2BC Form Security*
 4. Find the plugin in the list of results and click the **Install Now** button
 5. Click **OK** to confirm the plugin installation.  If there are any file permission issues, WordPress may ask for a valid FTP account to continue.  Either enter the FTP credentials, or proceed to the Manual installation instructions.
 6. Click the **Activate Plugin** link after the installation is complete
