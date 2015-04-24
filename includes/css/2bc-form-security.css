@@ -1,0 +1,28 @@
+/* 2BC Form Security CSS */
+/** fix recaptcha on login form **/
+
+#loginform .g-recaptcha > div > div,
+#registerform .g-recaptcha > div > div {
+	max-width: 100%;
+	margin-bottom: 10px;
+}
+
+#loginform .g-recaptcha iframe,
+#registerform .g-recaptcha iframe {
+	margin: 0 0 10px -15px;
+	transform: scale(0.9);
+	-webkit-transform: scale(0.9);
+	-moz-transform: scale(0.9);
+	-o-transform: scale(0.9);
+	-ms-transform: scale(0.9);	
+}
+
+#commentform .g-recaptcha {
+	margin: 20px auto 0;
+	width: 304px;
+}
+
+body.registration.buddypress .g-recaptcha {
+	position: relative;
+	top: 20px;
+}

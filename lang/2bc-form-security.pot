@@ -1,0 +1,452 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2bc-form-security\n"
+"POT-Creation-Date: 2015-04-06 15:40-0800\n"
+"PO-Revision-Date: 2015-04-06 15:42-0800\n"
+"Last-Translator: Jason Dreher <jason@2bcoding.com>\n"
+"Language-Team: 2BCoding <info@2bcoding.com>\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.7.5\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: 2bc-form-security.php:168
+msgid "Where To Display"
+msgstr ""
+
+#: 2bc-form-security.php:173
+msgid "Registration Form"
+msgstr ""
+
+#: 2bc-form-security.php:176
+msgid "Display form security tools in the WordPress registration form"
+msgstr ""
+
+#: 2bc-form-security.php:181
+msgid "Login Form"
+msgstr ""
+
+#: 2bc-form-security.php:184
+msgid "Display form security tools in the WordPress login form"
+msgstr ""
+
+#: 2bc-form-security.php:189
+msgid "Comment Form"
+msgstr ""
+
+#: 2bc-form-security.php:192
+msgid "Display form security tools in the WordPress comment form"
+msgstr ""
+
+#: 2bc-form-security.php:200
+msgid "Google reCAPTCHA Options"
+msgstr ""
+
+#: 2bc-form-security.php:205
+msgid "Enable reCAPTCHA"
+msgstr ""
+
+#: 2bc-form-security.php:207
+msgid "Enable the Google reCAPTCHA tool for the checked forms"
+msgstr ""
+
+#: 2bc-form-security.php:213
+msgid "Site Key"
+msgstr ""
+
+#: 2bc-form-security.php:215
+msgid "Enter your Google reCAPTCHA Site key for this site"
+msgstr ""
+
+#: 2bc-form-security.php:221
+msgid "Secret Key"
+msgstr ""
+
+#: 2bc-form-security.php:223
+msgid "Enter your Google reCAPTCHA Secret key for this site"
+msgstr ""
+
+#: 2bc-form-security.php:229
+msgid "Record Users IP"
+msgstr ""
+
+#: 2bc-form-security.php:231
+msgid ""
+"Attempt to get the users IP.  Will send to Google for extra security "
+"validation, and will be displayed in the Reports tab."
+msgstr ""
+
+#: 2bc-form-security.php:238
+msgid "reCAPTCHA Theme"
+msgstr ""
+
+#: 2bc-form-security.php:240
+msgid "Select which theme to display the Google reCAPTCHA tool in"
+msgstr ""
+
+#: 2bc-form-security.php:243
+msgid "Light"
+msgstr ""
+
+#: 2bc-form-security.php:244
+msgid "Dark"
+msgstr ""
+
+#: 2bc-form-security.php:253
+msgid "Error Handling"
+msgstr ""
+
+#: 2bc-form-security.php:257
+msgid "Login Errors"
+msgstr ""
+
+#: 2bc-form-security.php:259
+msgid "Select how to handle login errors"
+msgstr ""
+
+#: 2bc-form-security.php:262
+msgid ""
+"<strong>2BC Form Security Error</strong> &ndash; Return a "
+"<code>twobc_form_security</code> error message that says <em>Security checks "
+"failed</em>"
+msgstr ""
+
+#: 2bc-form-security.php:263
+msgid ""
+"<strong>Generic Errors</strong> &ndash; Return a generic <code>login_failed</"
+"code> error that simply says <em>Login failed</em>, to prevent hackers from "
+"learning valid user account names"
+msgstr ""
+
+#: 2bc-form-security.php:267
+msgid "Comment Status"
+msgstr ""
+
+#: 2bc-form-security.php:269
+msgid ""
+"Control how failed comments are handled.  Options are to automatically mark "
+"as <strong>Spam</strong> (default), or put into the <strong>Moderation "
+"Queue</strong>."
+msgstr ""
+
+#: 2bc-form-security.php:272
+msgid "Spam"
+msgstr ""
+
+#: 2bc-form-security.php:273
+msgid "Moderation Queue"
+msgstr ""
+
+#: 2bc-form-security.php:280 2bc-form-security.php:648
+msgid "Reports"
+msgstr ""
+
+#: 2bc-form-security.php:284
+msgid "Enable Reporting"
+msgstr ""
+
+#: 2bc-form-security.php:287
+msgid ""
+"Record security failures in the <strong>Reports</strong> tab to help gauge "
+"the effectivness of the fields"
+msgstr ""
+
+#: 2bc-form-security.php:403 2bc-form-security.php:404
+msgid "2BC Form Security"
+msgstr ""
+
+#: 2bc-form-security.php:444
+msgid "ERROR: Invalid Secret Key"
+msgstr ""
+
+#: 2bc-form-security.php:445
+msgid ""
+"ERROR: The API keys are good, however Google says you are a robot&hellip; "
+"maybe you should try again?"
+msgstr ""
+
+#: 2bc-form-security.php:446
+msgid "Complete the reCAPTCHA widget below to confirm the API keys."
+msgstr ""
+
+#: 2bc-form-security.php:447
+msgid ""
+"API Keys Confirmed! Click the <strong>Save all settings</strong> button to "
+"activate the reCAPTCHA widget."
+msgstr ""
+
+#: 2bc-form-security.php:448
+msgid "Are you sure you want to clear the tracking log?"
+msgstr ""
+
+#: 2bc-form-security.php:555
+#, php-format
+msgid ""
+"Enter your Google reCAPTCHA V2 API keys below.  If you do not have API keys, "
+"see the 2BC blog post on<br>\n"
+"%1$sHow To Get Google reCAPTCHA V2 API Keys%2$s"
+msgstr ""
+
+#: 2bc-form-security.php:595
+msgid "Change API Keys"
+msgstr ""
+
+#: 2bc-form-security.php:609 2bc-form-security.php:2037
+#: 2bc-form-security.php:2059
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: 2bc-form-security.php:646
+msgid "Settings"
+msgstr ""
+
+#: 2bc-form-security.php:653
+msgid "2BC Form Security Options"
+msgstr ""
+
+#: 2bc-form-security.php:656
+#, php-format
+msgid ""
+"More help available at the %1$s2BC Form Security documentation page%2$s."
+msgstr ""
+
+#: 2bc-form-security.php:674
+msgid "Save all settings"
+msgstr ""
+
+#: 2bc-form-security.php:694
+msgid "<strong>ERROR:</strong> Invalid tab!"
+msgstr ""
+
+#: 2bc-form-security.php:834
+msgid "Settings saved."
+msgstr ""
+
+#: 2bc-form-security.php:1056 2bc-form-security.php:1171
+msgid "Total"
+msgstr ""
+
+#: 2bc-form-security.php:1066
+msgid "Security checks failed:"
+msgstr ""
+
+#: 2bc-form-security.php:1071
+msgid "Security Methods"
+msgstr ""
+
+#: 2bc-form-security.php:1092
+msgid "Honeypot failures:"
+msgstr ""
+
+#: 2bc-form-security.php:1094
+msgid "Google reCAPTCHA &ndash; empty:"
+msgstr ""
+
+#: 2bc-form-security.php:1096
+msgid "Google reCAPTCHA &ndash; failures:"
+msgstr ""
+
+#: 2bc-form-security.php:1102
+msgid "Locations"
+msgstr ""
+
+#: 2bc-form-security.php:1123
+msgid "Registration form failures:"
+msgstr ""
+
+#: 2bc-form-security.php:1125
+msgid "Login form failures:"
+msgstr ""
+
+#: 2bc-form-security.php:1127
+msgid "Comment form failures:"
+msgstr ""
+
+#: 2bc-form-security.php:1133
+msgid "Log"
+msgstr ""
+
+#: 2bc-form-security.php:1155
+msgid "ID"
+msgstr ""
+
+#: 2bc-form-security.php:1157
+msgid "IP Address"
+msgstr ""
+
+#: 2bc-form-security.php:1159
+msgid "Registration"
+msgstr ""
+
+#: 2bc-form-security.php:1161
+msgid "Login"
+msgstr ""
+
+#: 2bc-form-security.php:1163
+msgid "Comment"
+msgstr ""
+
+#: 2bc-form-security.php:1165
+msgid "Honeypots"
+msgstr ""
+
+#: 2bc-form-security.php:1167
+msgid "reCAPTCHA | null"
+msgstr ""
+
+#: 2bc-form-security.php:1169
+msgid "reCAPTCHA | bad"
+msgstr ""
+
+#: 2bc-form-security.php:1249
+msgid "Clear Log"
+msgstr ""
+
+#: 2bc-form-security.php:1273
+msgid "&laquo; Previous Page "
+msgstr ""
+
+#: 2bc-form-security.php:1275
+msgid "Next Page &raquo;"
+msgstr ""
+
+#: 2bc-form-security.php:1314
+msgid ""
+"<strong>ERROR:</strong> Reporting is not currently enabled! Click the "
+"Settings tab to turn reporting on."
+msgstr ""
+
+#: 2bc-form-security.php:1333
+#, php-format
+msgid ""
+"<strong>2BC Form Security</strong> has been activated! Visit the "
+"%1$sSettings Page%2$s to choose which forms to protect. Save the settings to "
+"dismiss this message."
+msgstr ""
+
+#: 2bc-form-security.php:1614
+msgid "<strong>ERROR:</strong> Security checks failed"
+msgstr ""
+
+#: 2bc-form-security.php:1749
+msgid "2BC Form Security Summary"
+msgstr ""
+
+#: 2bc-form-security.php:1773
+msgid "Report Summary"
+msgstr ""
+
+#: 2bc-form-security.php:1782
+#, php-format
+msgid "Total events: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1795
+#, php-format
+msgid "Honeypot events: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1803
+#, php-format
+msgid "reCAPTCHA | null: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1810
+#, php-format
+msgid "reCAPTCHA | bad: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1823
+#, php-format
+msgid "Registration form: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1830 2bc-form-security.php:1858
+#, php-format
+msgid "Login form: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1837 2bc-form-security.php:1859
+#, php-format
+msgid "Comment form: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1846
+msgid "Current Settings"
+msgstr ""
+
+#: 2bc-form-security.php:1851
+msgid "Yes"
+msgstr ""
+
+#: 2bc-form-security.php:1852
+msgid "No"
+msgstr ""
+
+#: 2bc-form-security.php:1855
+#, php-format
+msgid "reCAPTCHA enabled: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1856
+#, php-format
+msgid "reCAPTCHA valid: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1857
+#, php-format
+msgid "Register form: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1860
+#, php-format
+msgid "Record IPs: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1861
+#, php-format
+msgid "Reporting Enabled: %s"
+msgstr ""
+
+#: 2bc-form-security.php:1928
+msgid "<strong>ERROR:</strong> Security checks failed."
+msgstr ""
+
+#: 2bc-form-security.php:1929
+msgid "<strong>ERROR:</strong> Login failed."
+msgstr ""
+
+#: 2bc-form-security.php:2065
+msgid "Google reCAPTCHA API keys missing or invalid."
+msgstr ""
+
+#: 2bc-form-security.php:2070
+msgid "Google reCAPTCHA not clicked."
+msgstr ""
+
+#: 2bc-form-security.php:2073
+msgid "Could not get secret key"
+msgstr ""
+
+#: includes/class_twobc_wpadmin_input_fields_1_0_1.php:94
+msgid "Error - type cannot be empty"
+msgstr ""
+
+#: includes/class_twobc_wpadmin_input_fields_1_0_1.php:110
+#, php-format
+msgid "Error - invalid type - %s"
+msgstr ""
+
+#: includes/class_twobc_wpadmin_input_fields_1_0_1.php:116
+msgid "Error - name cannot be empty"
+msgstr ""
+
+#: includes/class_twobc_wpadmin_input_fields_1_0_1.php:120
+#, php-format
+msgid "Error - invalid name - %s"
+msgstr ""
