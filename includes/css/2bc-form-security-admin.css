@@ -1,0 +1,303 @@
+/* general CSS */
+.twobc_formsecurity_clear_log_btn {
+	display: block;
+	background: rgb(193,3,3); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(193,3,3,1) 0%, rgba(143,2,34,1) 63%, rgba(114,0,1,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(193,3,3,1)), color-stop(63%,rgba(143,2,34,1)), color-stop(100%,rgba(114,0,1,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(193,3,3,1) 0%,rgba(143,2,34,1) 63%,rgba(114,0,1,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(193,3,3,1) 0%,rgba(143,2,34,1) 63%,rgba(114,0,1,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(193,3,3,1) 0%,rgba(143,2,34,1) 63%,rgba(114,0,1,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  rgba(193,3,3,1) 0%,rgba(143,2,34,1) 63%,rgba(114,0,1,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#c10303", endColorstr="#720001",GradientType=0 ); /* IE6-9 */
+	border-radius: 5px;
+	outline: none;
+	border: #ff0000 1px solid;
+	font-size: 1.1em;
+	cursor: pointer;
+	margin-bottom: 10px;
+	color: #fff;
+	-moz-transition: opacity .5s ease, margin .5s ease;
+	-webkit-transition: opacity .5s ease, margin .5s ease;
+	-o-transition: opacity .5s ease, margin .5s ease;
+	-ms-transition: opacity .5s ease, margin .5s ease;
+	transition: opacity .5s ease, margin .5s ease;
+	opacity:.7;
+	filter(alpha(opacity=70));
+}
+
+/* dashboard CSS */
+#twobc_formsecurity_admin_widget .twobc_formsecurity_widget_col {
+	display: inline-block;
+	padding: 0 1%;
+	vertical-align: top;
+	width: 47%;
+}
+#twobc_formsecurity_admin_widget h4 {
+	background-color: #ccc;
+	font-weight: bold;
+	padding: 5px;
+	text-align: center;
+}
+
+
+
+
+#twobc_formsecurity_admin_widget li span {
+	float: right;
+	font-weight: bold;
+}
+
+#twobc_formsecurity_admin_widget .indicate_yes {
+	border: 1px solid #008200;
+}
+
+#twobc_formsecurity_admin_widget .indicate_yes span {
+	color: #008200;
+}
+
+#twobc_formsecurity_admin_widget .indicate_no {
+	border: 1px solid #d40000;
+}
+
+#twobc_formsecurity_admin_widget .indicate_no span {
+	color: #d40000;
+}
+
+#twobc_formsecurity_admin_widget .col_1 ul {
+	margin-bottom: 26px;
+}
+#twobc_formsecurity_admin_widget .col_1 ul.last_instance {
+	margin-bottom: 0;
+}
+
+#twobc_formsecurity_admin_widget .col_2 li {
+	padding: 2px 4px;
+}
+
+/* options page CSS */
+#twobc_formsecurity_options_wrap h3 {
+	background: #ccc;
+	margin: 1em -10px;
+	padding: 20px 10px;
+}
+
+#twobc_formsecurity_options_wrap #twobcfs_change_api.button {
+	display: block;
+	margin-top: 10px;
+}
+
+#twobc_api_render_check {
+	margin-top: 10px;
+}
+
+.form-table .twobc_recapt_message_instruct {
+	color:#A50000;
+	background: #F4E3E3;
+	border:#A50000 1px solid;
+	border-radius: 5px;
+	text-align: center;
+	display: block;
+	padding: 5px 10px;
+	max-width: 300px;
+	box-sizing: border-box;
+	margin-top: 20px;
+}
+.form-table .twobc_recapt_message_success,
+.form-table .twobcfs_help_text
+{
+	color: #367E36;
+	background: #C2E5C7;
+	border: #367E36 1px solid;
+	border-radius: 5px;
+	text-align: center;
+	display: block;
+	padding: 5px 10px;
+	max-width: 300px;
+	box-sizing: border-box;
+	margin-top: 10px;
+}
+
+.form-table td p.twobcfs_help_text {
+	margin-bottom: 20px;
+}
+#twobc_api_render_check div,#twobc_api_render_check iframe {
+	max-width: 100%;
+	width: auto!important;
+}
+#twobc_api_render_check > .return_error {
+	color: #ff0000;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	padding-left: 30px;
+	padding-right: 30px;
+	box-sizing: border-box;
+	width: 300px;
+	height: 74px;
+	-webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);
+  -moz-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);
+  box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);
+  -webkit-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);
+  -moz-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);
+	display: table-cell;
+	vertical-align: middle;
+}
+/** add a little padding to error messages **/
+#twobc_formsecurity_options_wrap .error,
+#twobc_formsecurity_options_wrap .settings-error
+{
+	margin-top: 20px;
+}
+
+/** reports CSS **/
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports ul {
+	font-size: 1.3em;
+}
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports li {
+	font-weight: bold;
+	padding: 10px 0;
+}
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports li span {
+	background-color: #fefefe;
+	border: 1px solid #010101;
+	border-radius: 5px;
+	color: #ff0000;
+	float: right;
+	margin-right: 60%;
+	margin-top: -5px;
+	padding: 5px 10px;
+
+	-webkit-transition: margin 0.5s;
+	transition: margin 0.5s;
+}
+
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_clear_log_btn {
+	display: inline-block;
+	float: right;
+	font-size: 0.8em;
+	font-weight: normal;
+	margin-right: 60%;
+	margin-top: -8px;
+	padding: 8px 25px;
+}
+
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports table {
+	border: 1px solid #010101;
+	border-collapse: collapse;
+	text-align: center;
+	margin: 10px 0;
+	width: 100%;
+}
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports th,
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports td {
+	border-right: 1px solid #010101;
+}
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports th:last-child,
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports td:last-child {
+	border-right: none;
+}
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports th {
+	background-color: #fefefe;
+	border-bottom: 1px solid #010101;
+	padding: 5px 8px;
+}
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .even td {
+	background-color: #fefefe;
+	padding: 5px 0;
+}
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .odd td {
+	background-color: #e0e0e0;
+	padding: 5px 0;
+}
+
+
+
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_clear_log_btn:hover {
+	opacity:1;
+filter(alpha(opacity=100));
+}
+
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_page_prev,#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_page_next {
+	display: inline-block;
+	padding: 5px 10px;
+	margin-right: 5px;
+	background: #DAE0FF;
+	border: #BBC0FA 1px solid;
+	border-radius: 5px;
+	text-decoration: none;
+	-moz-transition: color .5s ease, background-color .5s ease;
+	-webkit-transition: color .5s ease, background-color .5s ease;
+	-o-transition: color .5s ease, background-color .5s ease;
+	-ms-transition: color .5s ease, background-color .5s ease;
+	transition: color .5s ease, background-color .5s ease;
+}
+
+#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_page_prev:hover,#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_page_next:hover {
+	background: #EFF1FF;
+}
+
+/** BuddyPress styling **/
+#twobc_formsecurity_options_wrap .options_flag_buddypress {
+	
+}
+#twobc_formsecurity_options_wrap .options_flag_buddypress img {
+	vertical-align: middle;
+}
+
+/*** responsive CSS ***/
+@media (max-width: 1440px) {
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports li span,
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_clear_log_btn
+	{
+		margin-right: 40%;
+	}
+}
+@media (max-width: 720px) {
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports li span
+
+	{
+		display: block;
+		float: none;
+		margin-right: 0;
+		margin-top: 10px;
+		padding: 15px;
+		text-align: center;
+	}
+
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .twobc_formsecurity_clear_log_btn {
+		margin-right: 0;
+	}
+
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .col_register,
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .col_login,
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .col_comment,
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .col_hp,
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .col_rcp_null,
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports .col_rcp_bad
+	{
+		display: none;
+	}
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports table {
+		font-size: 1.4em;
+	}
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports th,
+	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports td {
+		padding: 10px;
+	}
+}
+
+@media (max-width: 450px) {
+	#twobc_formsecurity_admin_widget {
+		text-align: center;
+	}
+
+	#twobc_formsecurity_admin_widget li span {
+		float: none;
+		display: block;
+		width: auto;
+	}
+}
