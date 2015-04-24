@@ -192,7 +192,6 @@ class twobc_form_security {
 						'description' => esc_html(__('Enter your Google reCAPTCHA Site key for this site',
 							 '2bc-form-security')),
 						'default' => '',
-						'class' => 'regular-text code',
 					),
 
 					'secret_key' => array(
@@ -201,7 +200,6 @@ class twobc_form_security {
 						'description' => esc_html(__('Enter your Google reCAPTCHA Secret key for this site',
 							 '2bc-form-security')),
 						'default' => '',
-						'class' => 'regular-text code',
 					),
 
 					'record_ips' => array(
@@ -476,6 +474,12 @@ class twobc_form_security {
 							'ERROR: Invalid Secret Key', 'Error', '2bc-form-security')),
 						'errorResponse' => esc_html(__(
 		'ERROR: The API keys are good, however Google says you are a robot&hellip; maybe you should try again?',
+							 'Error', '2bc-form-security')),
+						'errorGeneric' => esc_html(__(
+		'ERROR: No error message provided - likely a site_key / secret_key mismatch.',
+							 'Error', '2bc-form-security')),
+						'noresponse' => esc_html(__(
+		'ERROR: No response returned from Google...',
 							 'Error', '2bc-form-security')),
 						'instructMessage1' => esc_html(__(
 							'Complete the reCAPTCHA widget below to confirm the API keys.', '2bc-form-security')),

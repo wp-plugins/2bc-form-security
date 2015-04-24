@@ -17,11 +17,12 @@ jQuery(document).ready(function($) {
 			'twobcfs_site_key': site_key,
 			'twobcfs_secret_key': secret_key
 		};
+		
 		$.post(ajaxurl, googleAjaxArgs, function (response) {
+			var newdiv = document.getElementById('twobc_api_render_check');
+			var responsemessage = document.createElement('p');
 			if (response) {
-				response = JSON.parse(response);
-				var responsemessage = document.createElement('p');
-				var newdiv = document.getElementById('twobc_api_render_check');
+				response = JSON.parse(response);				
 				if ( response.success ) {
 					$enable_recaptcha.prop('checked', true);
 					validation_population(1);
@@ -37,20 +38,31 @@ jQuery(document).ready(function($) {
 					if ( response['error-codes'] ) {
 						if ( -1 != response['error-codes'].indexOf('invalid-input-secret') ) {
 							responsemessage.innerHTML = twoBCFormSecurity.errorSecretKey;
-							responsemessage.className = 'return_error';
+							responsemessage.className = 'return_error';							
 						}
 						if (-1 != response['error-codes'].indexOf('invalid-input-response')) {
 							responsemessage.innerHTML = twoBCFormSecurity.errorResponse;
 							responsemessage.className = 'return_error';
 						}
-						if(newdiv) {
-							$(newdiv).append(responsemessage);
-						}
+					} else {
+						responsemessage.innerHTML = twoBCFormSecurity.errorGeneric;
+						responsemessage.className = 'return_error';						
 					}
+					if(newdiv) {
+						$(newdiv).append(responsemessage);
+					}
+					$('.twobc_recapt_message_instruct').remove();
 					$enable_recaptcha.prop('checked', false);
 					$site_and_secret.prop('disabled', false);
 					$enable_recaptcha.removeClass('recaptcha_valid');
 					validation_population(0);
+				}
+			} else {
+				responsemessage.innerHTML = twoBCFormSecurity.noresponse;
+				responsemessage.className = 'return_error';
+				$('.twobc_recapt_message_instruct').remove();
+				if(newdiv) {
+					$(newdiv).append(responsemessage);
 				}
 			}
 		});

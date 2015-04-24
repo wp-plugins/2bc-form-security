@@ -6,7 +6,7 @@ Author URI: http://2bcoding.com/
 Plugin URI: http://2bcoding.com/plugins/2bc-form-security/
 Requires at least: 3.6
 Tested up to: 4.2
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,10 @@ Edit the options screen and click **Enable Reporting** to see a summary of what 
 
 == Changelog ==
 
+= 2.0.1 =
+* Fixed minor styling issues in options screen
+* Added error when site key and secret key are valid, but not paired
+
 = 2.0.0 =
 * Added integration with BuddyPress registration form
 * Added ob_clean before ajax response to remove WP debugging messages
@@ -101,6 +105,9 @@ Edit the options screen and click **Enable Reporting** to see a summary of what 
 * Launch of 2BC Form Security
 
 == Upgrade Notice ==
+
+= 2.0.1 =
+Fixed issues in admin screen
 
 = 2.0.0 =
 BuddyPress integration, fixes some issues in admin screen
