@@ -21,3 +21,8 @@
 	margin: 20px auto 0;
 	width: 304px;
 }
+
+body.registration.buddypress .g-recaptcha {
+	position: relative;
+	top: 20px;
+}

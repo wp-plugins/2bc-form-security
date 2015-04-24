@@ -1,30 +1,32 @@
 === 2BC Form Security ===
 Contributors: 2bc_jason, 2bc_aron
 Donate link: http://2bcoding.com/donate-to-2bcoding/
-Tags: 2bc, 2bcoding, google, recaptcha, google recaptcha, captcha, integration, honeypot, spam, security, statistics, form, forms, login, registration, comments
+Tags: 2bc, 2bcoding, google, recaptcha, captcha, nocaptcha, integration, honeypot, spam, security, statistics, form, forms, login, registration, comments, buddypress
 Author URI: http://2bcoding.com/
 Plugin URI: http://2bcoding.com/plugins/2bc-form-security/
 Requires at least: 3.6
-Tested up to: 4.1.1
-Stable tag: 1.0.0
+Tested up to: 4.2
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Increase security and reduce spam by adding a honeypot and Google reCAPTCHA V2 to the log in form, registration form, and comment form
+Add a honeypot and Google reCAPTCHA V2 (noCAPTCHA CAPTCHA) to the log in form, registration form, and comment form
 
 == Description ==
 
-The [2BC Form Security](http://2bcoding.com/plugins/2bc-form-security/) WordPress plugin will increase security and reduce spam by using tools like the Google reCAPTCHA V2 widget and a honeypot field.  While simple, these can be very effective at keeping spam bots and scripts out of your site.
+The [2BC Form Security](http://2bcoding.com/plugins/2bc-form-security/) WordPress plugin will increase security and reduce spam by using tools like the Google reCAPTCHA V2 widget (noCAPTCHA CAPTCHA) and a honeypot field.  While simple, these can be very effective at keeping spam bots and scripts out of your site.
 
 = Features =
 
-2BC Form Security will automatically activate a honeypot field in any of the locations marked in the settings.  With a few minutes of setup, it can also display the [Google reCAPTCHA v2](https://www.google.com/recaptcha/) widget in the same locations.
+2BC Form Security can now add the reCAPTCHA widget to BuddyPress!  Simply fill in the API keys, enable reCAPTCHA, and check the **Registration Form** under the *Where To Display* section.
+
+2BC Form Security will automatically activate a honeypot on the log in form, registration form, and comment form.  With a few minutes of setup, it can also display the [Google reCAPTCHA v2](https://www.google.com/recaptcha/) widget in any of the same locations.
 
 The reason captcha and honeypots work is because spam bots and scripts have a hard time reading CSS and Javascript when they are trying to fill out a form.  The honeypot is hidden from a normal user, but a bot  will try to fill in the field with some information.  If anything is detected in a honeypot field, 2BC Form Security will return an error and prevent the action from happening.
 
-Google reCAPTCHA has historically been difficult because Google used warped pictures that were hard for bots AND humans to fill out.  Now it has been condensed into a Javascript widget.  This is the first level of defense: bots have a hard time detecting or clicking Javascript elements in a web page.  However humans have a very easy time, they simply have to click.
+Google reCAPTCHA has historically been difficult because Google used warped pictures that were hard for bots AND humans to fill out.  Now it has been condensed into a Javascript widget, otherwise known as the new noCAPTCHA CAPTCHA.  No more letters and numbers that are hard to read, simply click the widget to proceed.  This is the first level of defense: bots have a hard time detecting or clicking Javascript elements in a web page.  However humans have a very easy time, even on mobile devices.
 
-Eventually spam bots will figure out a way around this.  Google has many additional layers of defense and have prepared extra questions.  Some of the new challenges will be incredibly hard for a bot to work out, but are still easy on humans and actually fun to complete!
+If spam bots are able to figure out a way around this, Google has added many additional layers of defense and have prepared extra questions.  Some of the new challenges will be incredibly hard for a bot to work out, but are still easy on humans and actually fun to complete!
 
 In addition to adding the honeypot and Google reCAPTCHA tools, 2BC Form Security has the following features:
 
@@ -33,8 +35,9 @@ In addition to adding the honeypot and Google reCAPTCHA tools, 2BC Form Security
 * Mark failed comments as Spam, or put into the Moderation Queue
 * Dashboard widget
 * Style the Google reCAPTCHA widget in either of the current themes: Light or Dark
+* Compatible with BuddyPress 1.6+
 
-Future updates include integration with *BuddyPress*, *bbPress*, *Contact Form 7*, and a shortcode for custom forms.
+Future updates include integration with *bbPress*, *Contact Form 7*, and a shortcode for custom forms.
 
 = Documentation =
 
@@ -86,10 +89,21 @@ Edit the options screen and click **Enable Reporting** to see a summary of what 
 
 == Changelog ==
 
+= 2.0.0 =
+* Added integration with BuddyPress registration form
+* Added ob_clean before ajax response to remove WP debugging messages
+* Ensuring HTTP API error won't lock users out of a site
+* Only loading reCAPTCHA scripts if options are correctly set
+* Setting honeypot to always display, everywhere
+* Shortened honeypot filter css name to twobcfs_hp_css
+
 = 1.0.0 =
 * Launch of 2BC Form Security
 
 == Upgrade Notice ==
+
+= 2.0.0 =
+BuddyPress integration, fixes some issues in admin screen
 
 = 1.0.0 =
 Launch of 2BC Form Security

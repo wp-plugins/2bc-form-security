@@ -3,16 +3,14 @@
  * Plugin Name: 2BC Form Security
  * Plugin URI: http://2bcoding.com/plugins/2bc-form-security/
  * Description: Increase security and reduce spam by adding a honeypot and Google reCAPTCHA V2 to the log in form, registration form, and comment form
- * Version: 1.0.0
+ * Version: 2.0.0
  * Author: 2BCoding
  * Author URI: http://2bcoding.com/
  * Text Domain: 2bc-form-security
  * License: GPL2
- */
-/**
- * Requires:
- * 	PHP			5.2.0
- * 	WordPress	3.6.0
+ *
+ * @package WordPress
+ * @subpackage 2BC-Form-Security
  */
 
 /*
@@ -85,6 +83,14 @@ add_action('wp_ajax_twobc_formsecurity_reset_log', array($core, 'ajax_reset_repo
 add_action('wp_ajax_twobcfs_recaptcha_valid', array($core, 'ajax_recaptcha_valid'));
 add_action('wp_ajax_twobcfs_recacptcha_verify_api', array($core, 'ajax_recaptcha_verify_api'));
 
+// hooks - BuddyPress
+add_action('bp_include', array($core, 'hook_buddypress'));
+add_action('bp_enqueue_scripts', array($core, 'hook_bp_enqueue_scripts'));
+// BuddyPress registration form
+add_action('bp_head', array($core, 'hook_bp_head'));
+add_action('bp_after_registration_submit_buttons', array($core, 'hook_bp_after_submit'));
+add_action('bp_signup_validate', array($core, 'hook_bp_signup_validate'));
+
 /*************************************************
  * Class Definition
  ************************************************/
@@ -93,7 +99,7 @@ add_action('wp_ajax_twobcfs_recacptcha_verify_api', array($core, 'ajax_recaptcha
  */
 class twobc_form_security {
 	private static $instance = null;
-	private static $plugin_version = '1.0.0';
+	private static $plugin_version = '2.0.0';
 	private static $plugin_options;
 	private static $plugin_url;
 	private static $plugin_path;
@@ -101,6 +107,8 @@ class twobc_form_security {
 	private static $google_verify_url = 'https://www.google.com/recaptcha/api/siteverify';
 
 	private static $honeypot_name;
+
+	private static $buddypress = false;
 
 	/**
 	 * Constructor - setup static properties
@@ -138,6 +146,7 @@ class twobc_form_security {
 	/**
 	 * Get the default plugin options
 	 *
+	 * @uses get_options_fields()
 	 * @return array
 	 */
 	private static function get_options_default() {
@@ -164,47 +173,15 @@ class twobc_form_security {
 		$checkbox_value = '1';
 
 		$option_fields = array(
-			'section_display' => array(
-				'title' => esc_html(__('Where To Display', '2bc-form-security')),
-				'callback' => 'options_display_cb',
-				'fields' => array(
-					// display checkboxes
-					'display_register' => array(
-						'title' => esc_html(__('Registration Form', '2bc-form-security')),
-						'type' => 'checkbox',
-						'value' => $checkbox_value,
-						'description' => esc_html(__('Display form security tools in the WordPress registration form',
-							'2bc-form-security')),
-						'default' => 0,
-					),
-					'display_login' => array(
-						'title' => esc_html(__('Login Form', '2bc-form-security')),
-						'type' => 'checkbox',
-						'value' => $checkbox_value,
-						'description' => esc_html(__('Display form security tools in the WordPress login form',
-							'2bc-form-security')),
-						'default' => 0,
-					),
-					'display_comment' => array(
-						'title' => esc_html(__('Comment Form', '2bc-form-security')),
-						'type' => 'checkbox',
-						'value' => $checkbox_value,
-						'description' => esc_html(__('Display form security tools in the WordPress comment form',
-							'2bc-form-security')),
-						'default' => 0,
-					),
-				),
-			),
-
 			'section_recaptcha' => array(
 				'title' => esc_html(__('Google reCAPTCHA Options', '2bc-form-security')),
 				'callback' => 'options_recaptcha_cb',
 				'fields' => array(
-
 					'enable_recaptcha' => array(
 						'title' => esc_html(__('Enable reCAPTCHA', '2bc-form-security')),
 						'type' => 'checkbox',
-						'description' => esc_html(__('Enable the Google reCAPTCHA tool for the checked forms', '2bc-form-security')),
+						'description' => esc_html(__('Enable the Google reCAPTCHA tool for the checked forms',
+							 '2bc-form-security')),
 						'value' => $checkbox_value,
 						'default' => 0,
 					),
@@ -212,41 +189,78 @@ class twobc_form_security {
 					'site_key' => array(
 						'title' => esc_html(__('Site Key', '2bc-form-security')),
 						'type' => 'text',
-						'description' => esc_html(__('Enter your Google reCAPTCHA Site key for this site', '2bc-form-security')),
+						'description' => esc_html(__('Enter your Google reCAPTCHA Site key for this site',
+							 '2bc-form-security')),
 						'default' => '',
-						'class' => array('regular-text', 'code'),
+						'class' => 'regular-text code',
 					),
 
 					'secret_key' => array(
 						'title' => esc_html(__('Secret Key', '2bc-form-security')),
 						'type' => 'text',
-						'description' => esc_html(__('Enter your Google reCAPTCHA Secret key for this site', '2bc-form-security')),
+						'description' => esc_html(__('Enter your Google reCAPTCHA Secret key for this site',
+							 '2bc-form-security')),
 						'default' => '',
-						'class' => array('regular-text', 'code'),
+						'class' => 'regular-text code',
 					),
 
 					'record_ips' => array(
 						'title' => esc_html(__('Record Users IP', '2bc-form-security')),
 						'type' => 'checkbox',
-						'description' => esc_html(__('Attempt to get the users IP.  Will send to Google for extra security validation, and will be displayed in the Reports tab.', '2bc-form-security')),
+						'description' => esc_html(__(
+'Attempt to get the users IP.  Will send to Google for extra security validation, and will be displayed in the Reports tab.',
+							 '2bc-form-security')),
 						'value' => $checkbox_value,
 						'default' => 0,
-
 					),
 
 					'recaptcha_theme' => array(
 						'title' => esc_html(__('reCAPTCHA Theme', '2bc-form-security')),
 						'type' => 'select',
-						'description' => esc_html(__('Select which theme to display the Google reCAPTCHA tool in', '2bc-form-security')),
+						'description' => esc_html(__('Select which theme to display the Google reCAPTCHA tool in',
+							 '2bc-form-security')),
 						'default' => 'light',
 						'options' => array(
 							'light' => esc_html(__('Light', '2bc-form-security')),
 							'dark' => esc_html(__('Dark', '2bc-form-security')),
 						),
 					),
-
-
 				),
+			),
+
+			'section_display' => array(
+					'title' => esc_html(__('Where To Display reCAPTCHA', '2bc-form-security')),
+					'callback' => 'options_display_cb',
+					'fields' => array(
+							// display checkboxes
+							'display_register' => array(
+								'title' => esc_html(__('Registration Form', '2bc-form-security')),
+								'type' => 'checkbox',
+								'value' => $checkbox_value,
+								'description' => esc_html(
+									__('Display form security tools in the WordPress registration form',
+									'2bc-form-security')),
+								'default' => 0,
+							),
+							'display_login' => array(
+								'title' => esc_html(__('Login Form', '2bc-form-security')),
+								'type' => 'checkbox',
+								'value' => $checkbox_value,
+								'description' => esc_html(
+									__('Display form security tools in the WordPress login form',
+									'2bc-form-security')),
+								'default' => 0,
+							),
+							'display_comment' => array(
+								'title' => esc_html(__('Comment Form', '2bc-form-security')),
+								'type' => 'checkbox',
+								'value' => $checkbox_value,
+								'description' => esc_html(
+									__('Display form security tools in the WordPress comment form',
+									'2bc-form-security')),
+								'default' => 0,
+							),
+					),
 			),
 
 			'section_errors' => array(
@@ -259,14 +273,20 @@ class twobc_form_security {
 						'description' => esc_html(__('Select how to handle login errors', '2bc-form-security')),
 						'default' => 'formsec_error',
 						'options' => array(
-							'formsec_error' => wp_kses_post(__('<strong>2BC Form Security Error</strong> &ndash; Return a <code>twobc_form_security</code> error message that says <em>Security checks failed</em>', '2bc-form-security')),
-							'generic_errors' => wp_kses_post(__('<strong>Generic Errors</strong> &ndash; Return a generic <code>login_failed</code> error that simply says <em>Login failed</em>, to prevent hackers from learning valid user account names', '2bc-form-security')),
+							'formsec_error' => wp_kses_post(__(
+'<strong>2BC Form Security Error</strong> &ndash; Return a <code>twobc_form_security</code> error message that says <em>Security checks failed</em>',
+								 '2bc-form-security')),
+							'generic_errors' => wp_kses_post(__(
+'<strong>Generic Errors</strong> &ndash; Return a generic <code>login_failed</code> error that simply says <em>Login failed</em>, to prevent hackers from learning valid user account names'
+								, '2bc-form-security')),
 						),
 					),
 					'comment_status' => array(
 						'title' => esc_html(__('Comment Status', '2bc-form-security')),
 						'type' => 'select',
-						'description' => wp_kses_post(__('Control how failed comments are handled.  Options are to automatically mark as <strong>Spam</strong> (default), or put into the <strong>Moderation Queue</strong>.', '2bc-form-security')),
+						'description' => wp_kses_post(__(
+'Control how failed comments are handled.  Options are to automatically mark as <strong>Spam</strong> (default), or put into the <strong>Moderation Queue</strong>.',
+							 '2bc-form-security')),
 						'default' => 'spam',
 						'options' => array(
 							'spam' => esc_html(__('Spam', '2bc-form-security')),
@@ -284,7 +304,9 @@ class twobc_form_security {
 						'title' => esc_html(__('Enable Reporting', '2bc-form-security')),
 						'type' => 'checkbox',
 						'value' => $checkbox_value,
-						'description' => wp_kses_post(__('Record security failures in the <strong>Reports</strong> tab to help gauge the effectivness of the fields', '2bc-form-security')),
+						'description' => wp_kses_post(__(
+		'Record security failures in the <strong>Reports</strong> tab to help gauge the effectiveness of the fields',
+							'2bc-form-security')),
 						'default' => 0,
 					),
 				),
@@ -339,8 +361,7 @@ class twobc_form_security {
 
 
 		// add twobc_wpadmin_input_fields for option fields
-		require_once(self::$plugin_path . 'includes/class_twobc_wpadmin_input_fields_1_0_1.php');
-
+		require_once(self::$plugin_path . 'includes/class_twobc_wpadmin_input_fields_1_0_2.php');
 
 		// handle install and upgrade
 		$plugin_version = self::$plugin_version;
@@ -372,7 +393,6 @@ class twobc_form_security {
 				}
 			}
 
-
 			// set the updated settings
 			$update_options = true;
 		}
@@ -386,10 +406,27 @@ class twobc_form_security {
 	}
 
 	/**
-	 * init hook - load plugin textdomain
+	 * init hook - load plugin textdomain, register scripts and styles
 	 */
 	public static function hook_init() {
 		load_plugin_textdomain('2bc-form-security', false, self::$plugin_path . 'lang');
+
+		// register recaptcha script for later enqueues
+		wp_register_script(
+			'twobc_formsecurity_captcha', // handle
+			'https://www.google.com/recaptcha/api.js', //src
+			array(), // dependencies
+			self::$plugin_version, // version
+			true // in footer
+		);
+
+		// register recaptcha style for later enqueues
+		wp_register_style(
+			'twobc_formsecurity_captcha_style', // handle
+			self::$plugin_url . 'includes/css/2bc-form-security.css', // URL src
+			array(), // dependencies
+			self::$plugin_version // version
+		);
 	}
 
 	/*************************************************
@@ -418,13 +455,7 @@ class twobc_form_security {
 		switch ($current_screen->base) {
 			case 'settings_page_twobc_formsecurity' :
 				// load recaptcha API, for validation of API keys
-				wp_enqueue_script(
-					'twobc_formsecurity_captcha', // handle
-					'https://www.google.com/recaptcha/api.js', //src
-					array(), // dependencies
-					self::$plugin_version, // version
-					false // in footer
-				);
+				wp_enqueue_script('twobc_formsecurity_captcha');
 				// no break, continue processing
 			case 'dashboard' :
 				// load plugin JS
@@ -441,11 +472,18 @@ class twobc_form_security {
 					'twoBCFormSecurity', // object name
 					array( // data to pass
 						'_ajax_nonce' => wp_create_nonce('twobc-formsecurity-ajaxnonce'),
-						'errorSecretKey' => esc_html(__('ERROR: Invalid Secret Key', 'Error', '2bc-form-security')),
-						'errorResponse' => esc_html(__('ERROR: The API keys are good, however Google says you are a robot&hellip; maybe you should try again?', 'Error', '2bc-form-security')),
-						'instructMessage1' => esc_html(__('Complete the reCAPTCHA widget below to confirm the API keys.', '2bc-form-security')),
-						'instructMessage2' => wp_kses_post(__('API Keys Confirmed! Click the <strong>Save all settings</strong> button to activate the reCAPTCHA widget.', '2bc-form-security')),
-						'clearLogsButton' => esc_html(__('Are you sure you want to clear the tracking log?', '2bc-form-security')),
+						'errorSecretKey' => esc_html(__(
+							'ERROR: Invalid Secret Key', 'Error', '2bc-form-security')),
+						'errorResponse' => esc_html(__(
+		'ERROR: The API keys are good, however Google says you are a robot&hellip; maybe you should try again?',
+							 'Error', '2bc-form-security')),
+						'instructMessage1' => esc_html(__(
+							'Complete the reCAPTCHA widget below to confirm the API keys.', '2bc-form-security')),
+						'instructMessage2' => wp_kses_post(__(
+		'API Keys Confirmed! Click the <strong>Save all settings</strong> button to activate the reCAPTCHA widget.',
+							'2bc-form-security')),
+						'clearLogsButton' => esc_html(__(
+							'Are you sure you want to clear the tracking log?', '2bc-form-security')),
 						'recaptchaValidNonce' => wp_create_nonce('twobc_formsecurity_nonce_recaptcha_valid'),
 					)
 				);
@@ -515,7 +553,7 @@ class twobc_form_security {
 		// UPDATE - save tab selection as cookie
 		if ( !empty($_GET['tab']) ) {
 			if ( 'settings' == $_GET['tab'] || 'reports' == $_GET['tab'] )
-				setcookie('twobc_formsec_opt_tab', esc_attr($_GET['tab']), time()*60*60*24*14, '/');
+				setcookie('twobc_formsec_opt_tab', esc_attr($_GET['tab']), time() * 1209600, '/'); // 2 weeks
 		}
 	}
 
@@ -524,10 +562,10 @@ class twobc_form_security {
 	 *
 	 * @param $field_args
 	 *
-	 * @uses twobc_wpadmin_input_fields_1_0_1
+	 * @uses twobc_wpadmin_input_fields_1_0_2
 	 */
 	public static function wpaf_option_field($field_args) {
-		$wpaf = new twobc_wpadmin_input_fields_1_0_1(
+		$wpaf = new twobc_wpadmin_input_fields_1_0_2(
 			array(
 				'nonce' => false,
 			)
@@ -536,7 +574,8 @@ class twobc_form_security {
 		$field_args = array_merge($wpaf->field_default_args(), $field_args);
 
 		$current_value = self::$plugin_options;
-		$field_args['current_value'] = ( isset($current_value[$field_args['name']]) ? $current_value[$field_args['name']] : '' );
+		$field_args['current_value'] = ( isset($current_value[$field_args['name']]) ?
+			$current_value[$field_args['name']] : '' );
 
 		// field nonce
 		echo '<input type="hidden" id="twobc_formsecurity_nonce_' . $field_args['name'] . '"';
@@ -551,8 +590,10 @@ class twobc_form_security {
 			case 'site_key' :
 				if ( empty(self::$plugin_options['recaptcha_valid']) && !self::recaptcha_has_args() ) {
 					echo '	<p class="twobcfs_help_text">';
-					printf(wp_kses_post(__('Enter your Google reCAPTCHA V2 API keys below.  If you do not have API keys, see the 2BC blog post on<br>
-%1$sHow To Get Google reCAPTCHA V2 API Keys%2$s', '2bc-form-security')), '<a href="http://2bcoding.com/how-to-get-google-recaptcha-v2-api-keys/" target="_blank">', '</a>');
+					printf(wp_kses_post(__(
+						'Enter your Google reCAPTCHA V2 API keys below.  If you do not have API keys, see the 2BCoding blog post on<br>
+%1$sHow To Get Google reCAPTCHA V2 API Keys%2$s', '2bc-form-security')),
+'<a href="http://2bcoding.com/how-to-get-google-recaptcha-v2-api-keys/" target="_blank">', '</a>');
 					echo '</p>
 ';
 				}
@@ -561,7 +602,8 @@ class twobc_form_security {
 			case 'secret_key' :
 				if ( !empty(self::$plugin_options['recaptcha_valid']) ) {
 					// output hidden fields so that the API keys are stored in the plugin options
-					echo '	<input type="hidden" name="twobc_formsecurity_options[' . $field_args['name'] . ']" value="' . self::$plugin_options[$field_args['name']] . '">
+					echo '	<input type="hidden" name="twobc_formsecurity_options[' . $field_args['name'] . ']" value="' .
+						self::$plugin_options[$field_args['name']] . '">
 	';
 					$field_args['disabled'] = true;
 				}
@@ -589,12 +631,20 @@ class twobc_form_security {
 
 		// UPDATE - add button to change current API keys
 		if ( 'twobc_formsecurity_options[secret_key]' == $field_args['name'] ) {
-			echo '	<input type="button" class="button" id="twobcfs_change_api" value="' . esc_html(__('Change API Keys', '2bc-form-security')) . '">
+			echo '	<input type="button" class="button" id="twobcfs_change_api" value="' .
+				esc_html(__('Change API Keys', '2bc-form-security')) . '">
 ';
 		}
 
 		echo '</fieldset>
 ';
+
+		if ( 'twobc_formsecurity_options[display_register]' == $field_args['name'] && self::$buddypress ) {
+			echo '	<p class="options_flag_buddypress">
+		<img src="' . self::$plugin_url .
+				'images/buddypress.png" height="25" width="25" alt="BuddyPress icon"><strong>';
+			echo esc_html(__('BuddyPress detected!', '2bc-form-security'));
+		}
 	}
 
 	/**
@@ -603,7 +653,9 @@ class twobc_form_security {
 	public static function settings_page_cb() {
 		//must check that the user has the required capability
 		if ( !current_user_can('manage_options') ) {
-			wp_die(esc_html(__('You do not have sufficient permissions to access this page.', '2bc-form-security')));
+			wp_die(esc_html(__(
+				'You do not have sufficient permissions to access this page.', '2bc-form-security'
+			)));
 		}
 
 		echo '<div id="twobc_formsecurity_options_wrap" class="wrap">
@@ -640,9 +692,11 @@ class twobc_form_security {
 
 		echo '	<h2 class="nav-tab-wrapper">
 ';
-		echo '		<a href="?page=twobc_formsecurity&tab=settings" class="' . $tab_class_settings . '">'. esc_html(__('Settings', '2bc-form-security')) . '</a>
+		echo '		<a href="?page=twobc_formsecurity&tab=settings" class="' . $tab_class_settings . '">'.
+			esc_html(__('Settings', '2bc-form-security')) . '</a>
 ';
-		echo '		<a href="?page=twobc_formsecurity&tab=reports" class="' . $tab_class_reports . '">'. esc_html(__('Reports', '2bc-form-security')). '</a>
+		echo '		<a href="?page=twobc_formsecurity&tab=reports" class="' . $tab_class_reports . '">'.
+			esc_html(__('Reports', '2bc-form-security')). '</a>
 ';
 		echo '	</h2>
 ';
@@ -650,7 +704,10 @@ class twobc_form_security {
 		echo '	<h2>' . esc_html(__('2BC Form Security Options', '2bc-form-security')) . '</h2>
 ';
 		echo '	<p>';
-		printf(wp_kses_post(__('More help available at the %1$s2BC Form Security documentation page%2$s.', '2bc-form-security')), '<a href="http://2bcoding.com/plugins/2bc-form-security/2bc-form-security-documentation/" target="_blank">', '</a>');
+		printf(wp_kses_post(__('More help available at the %1$s2BC Form Security documentation page%2$s.',
+			'2bc-form-security')),
+			'<a href="http://2bcoding.com/plugins/2bc-form-security/2bc-form-security-documentation/" target="_blank">',
+			'</a>');
 		echo '</p>
 ';
 
@@ -688,7 +745,8 @@ class twobc_form_security {
 				break;
 
 			default :
-				echo '	<div class="error"><p>' . wp_kses_post(__('<strong>ERROR:</strong> Invalid tab!', '2bc-form-security')) . '</p></div>
+				echo '	<div class="error"><p>' . wp_kses_post(__('<strong>ERROR:</strong> Invalid tab!',
+					'2bc-form-security')) . '</p></div>
 ';
 		}
 
@@ -1060,7 +1118,8 @@ KEY user_ip (user_ip)
 
 		$return .= '	<ul>
 ';
-		$return .= '		<li>' . esc_html(__('Security checks failed:', '2bc-form-security')) . ' <span>' . number_format($total) . '</span></li>
+		$return .= '		<li>' . esc_html(__('Security checks failed:', '2bc-form-security')) . ' <span>' .
+			number_format($total) . '</span></li>
 ';
 		$return .= '	</ul>
 ';
@@ -1086,11 +1145,14 @@ KEY user_ip (user_ip)
 		$return .= '	<ul>
 ';
 
-		$return .= '		<li>' . esc_html(__('Honeypot failures:', '2bc-form-security')) . ' <span>' . number_format($security_methods['honeypot']) . '</span></li>
+		$return .= '		<li>' . esc_html(__('Honeypot failures:', '2bc-form-security')) . ' <span>' .
+			number_format($security_methods['honeypot']) . '</span></li>
 ';
-		$return .= '		<li>' . esc_html(__('Google reCAPTCHA &ndash; empty:', '2bc-form-security')) . ' <span>' . number_format($security_methods['recap_null']) . '</span></li>
+		$return .= '		<li>' . esc_html(__('Google reCAPTCHA &ndash; empty:', '2bc-form-security')) .
+			' <span>' . number_format($security_methods['recap_null']) . '</span></li>
 ';
-		$return .= '		<li>' . esc_html(__('Google reCAPTCHA &ndash; failures:', '2bc-form-security')) . ' <span>' . number_format($security_methods['recap_bad']) . '</span></li>
+		$return .= '		<li>' . esc_html(__('Google reCAPTCHA &ndash; failures:', '2bc-form-security')) .
+			' <span>' . number_format($security_methods['recap_bad']) . '</span></li>
 ';
 
 		$return .= '	</ul>
@@ -1117,11 +1179,14 @@ KEY user_ip (user_ip)
 		$return .= '	<ul>
 ';
 
-		$return .= '		<li>' . esc_html(__('Registration form failures:', '2bc-form-security')) . ' <span>' . number_format($locations['register']) . '</span></li>
+		$return .= '		<li>' . esc_html(__('Registration form failures:', '2bc-form-security')) .
+			' <span>' . number_format($locations['register']) . '</span></li>
 ';
-		$return .= '		<li>' . esc_html(__('Login form failures:', '2bc-form-security')) . ' <span>' . number_format($locations['login']) . '</span></li>
+		$return .= '		<li>' . esc_html(__('Login form failures:', '2bc-form-security')) .
+			' <span>' . number_format($locations['login']) . '</span></li>
 ';
-		$return .= '		<li>' . esc_html(__('Comment form failures:', '2bc-form-security')) . ' <span>' . number_format($locations['comment']) . '</span></li>
+		$return .= '		<li>' . esc_html(__('Comment form failures:', '2bc-form-security')) .
+			' <span>' . number_format($locations['comment']) . '</span></li>
 ';
 
 		$return .= '	</ul>
@@ -1205,20 +1270,34 @@ KEY user_ip (user_ip)
 
 				$return .= '		<td class="col_ip">' . $_row_vars['user_ip'] . '</td>
 ';
-				$return .= '		<td class="col_register">' . number_format($_row_vars['register_hp'] + $_row_vars['register_rcp_null'] + $_row_vars['register_rcp_bad']) . '</td>
+				$return .= '		<td class="col_register">' .
+					number_format($_row_vars['register_hp'] + $_row_vars['register_rcp_null'] + $_row_vars['register_rcp_bad']) .
+					'</td>
 ';
-				$return .= '		<td class="col_login">' . number_format($_row_vars['login_hp'] + $_row_vars['login_rcp_null'] + $_row_vars['login_rcp_bad']) . '</td>
+				$return .= '		<td class="col_login">' .
+					number_format($_row_vars['login_hp'] + $_row_vars['login_rcp_null'] + $_row_vars['login_rcp_bad']) .
+					'</td>
 ';
-				$return .= '		<td class="col_comment">' . number_format($_row_vars['comment_hp'] + $_row_vars['comment_rcp_null'] + $_row_vars['comment_rcp_bad']) . '</td>
+				$return .= '		<td class="col_comment">' .
+					number_format($_row_vars['comment_hp'] + $_row_vars['comment_rcp_null'] + $_row_vars['comment_rcp_bad']) .
+					'</td>
 ';
 
-				$return .= '		<td class="col_hp">' . number_format($_row_vars['register_hp'] + $_row_vars['login_hp'] + $_row_vars['comment_hp']) . '</td>
+				$return .= '		<td class="col_hp">' .
+					number_format($_row_vars['register_hp'] + $_row_vars['login_hp'] + $_row_vars['comment_hp']) .
+					'</td>
 ';
-				$return .= '		<td class="col_rcp_null">' . number_format($_row_vars['register_rcp_null'] + $_row_vars['login_rcp_null'] + $_row_vars['comment_rcp_null']) . '</td>
+				$return .= '		<td class="col_rcp_null">' .
+					number_format($_row_vars['register_rcp_null'] + $_row_vars['login_rcp_null'] + $_row_vars['comment_rcp_null']) .
+					'</td>
 ';
-				$return .= '		<td class="col_rcp_bad">' . number_format($_row_vars['register_rcp_bad'] + $_row_vars['login_rcp_bad'] + $_row_vars['comment_rcp_bad']) . '</td>
+				$return .= '		<td class="col_rcp_bad">' .
+					number_format($_row_vars['register_rcp_bad'] + $_row_vars['login_rcp_bad'] + $_row_vars['comment_rcp_bad']) .
+					'</td>
 ';
-				$return .= '		<td class="col_total">' . number_format($_row_vars['total']) . '</td>
+				$return .= '		<td class="col_total">' .
+					number_format($_row_vars['total']) .
+					'</td>
 ';
 
 
@@ -1243,7 +1322,8 @@ KEY user_ip (user_ip)
 	 * @return string
 	 */
 	private static function get_clear_logs_button() {
-		$return = '<button type="button" class="twobc_formsecurity_clear_log_btn">' . esc_html(__('Clear Log', '2bc-form-security')) . '</button>
+		$return = '<button type="button" class="twobc_formsecurity_clear_log_btn">' .
+			esc_html(__('Clear Log', '2bc-form-security')) . '</button>
 ';
 
 		return $return;
@@ -1267,9 +1347,13 @@ KEY user_ip (user_ip)
 			)
 		);
 
-		$prev = '<a href="' . add_query_arg(array('page_num' => $page_num-1), $admin_url) . '#twobc_formsecurity_reports_table" class="twobc_formsecurity_page_prev">' . wp_kses_post(__('&laquo; Previous Page ', '2bc-form-security')) . '</a>
+		$prev = '<a href="' . add_query_arg(array('page_num' => $page_num-1), $admin_url) .
+			'#twobc_formsecurity_reports_table" class="twobc_formsecurity_page_prev">' .
+			wp_kses_post(__('&laquo; Previous Page ', '2bc-form-security')) . '</a>
 ';
-		$next = '<a href="' . add_query_arg(array('page_num' => $page_num+1), $admin_url) . '#twobc_formsecurity_reports_table" class="twobc_formsecurity_page_next">' . wp_kses_post(__('Next Page &raquo;', '2bc-form-security')) . '</a>
+		$next = '<a href="' . add_query_arg(array('page_num' => $page_num+1), $admin_url) .
+			'#twobc_formsecurity_reports_table" class="twobc_formsecurity_page_next">' .
+			wp_kses_post(__('Next Page &raquo;', '2bc-form-security')) . '</a>
 ';
 
 		switch (true) {
@@ -1308,7 +1392,9 @@ KEY user_ip (user_ip)
 		) {
 			echo '<div class="error">
 	<p>';
-			echo wp_kses_post(__('<strong>ERROR:</strong> Reporting is not currently enabled! Click the Settings tab to turn reporting on.', '2bc-form-security'));
+			echo wp_kses_post(__(
+'<strong>ERROR:</strong> Reporting is not currently enabled! Click the Settings tab to turn reporting on.',
+				'2bc-form-security'));
 			echo '</p>
 </div>
 ';
@@ -1327,7 +1413,9 @@ KEY user_ip (user_ip)
 					'page' => 'twobc_formsecurity',
 				)
 			);
-			printf(wp_kses_post(__('<strong>2BC Form Security</strong> has been activated! Visit the %1$sSettings Page%2$s to choose which forms to protect. Save the settings to dismiss this message.', '2bc-form-security')), '<a href="' . $admin_url . '">', '</a>');
+			printf(wp_kses_post(__(
+'<strong>2BC Form Security</strong> has been activated! Visit the %1$sSettings Page%2$s to activate reCAPTCHA. Save the settings to dismiss this message.',
+				'2bc-form-security')), '<a href="' . $admin_url . '">', '</a>');
 			echo '</p>
 </div>
 ';
@@ -1345,11 +1433,21 @@ KEY user_ip (user_ip)
 	 *
 	 * @return string
 	 */
-	private static function get_recaptcha_div($noscript = true) {
+	public static function get_recaptcha_div($noscript = true, $error_wrap = false) {
 		$return = '';
 
-		if ( self::recaptcha_has_args() && '1' == self::$plugin_options['recaptcha_valid'] ) {
-			$return = '<div class="g-recaptcha" data-sitekey="' . esc_attr(self::$plugin_options['site_key']) . '" data-theme="' . self::$plugin_options['recaptcha_theme'] . '"></div>';
+		if (
+			self::recaptcha_has_args()
+			&& !empty(self::$plugin_options['enable_recaptcha'])
+			&& !empty(self::$plugin_options['recaptcha_valid'])
+		) {
+			if ( $error_wrap ) {
+				/* $return .=
+'<input type="text" name="twobcfs_error_wrap" value="" style="height: 0; width: 0; border: none; font-size: 0; line-height: 0; padding: 0; margin: 0;">'; */
+			}
+
+			$return .= '<div class="g-recaptcha" data-sitekey="' . esc_attr(self::$plugin_options['site_key']) .
+				'" data-theme="' . self::$plugin_options['recaptcha_theme'] . '"></div>';
 
 			if ( !empty($noscript) ) {
 				$return .= '<noscript>
@@ -1383,8 +1481,9 @@ KEY user_ip (user_ip)
 	 *
 	 * @return string
 	 */
-	private static function get_honeypot() {
-		$return = '<input type="text" class="' . self::$honeypot_name . '" name="' .  self::$honeypot_name . '[]" value="" autocomplete="off" />
+	public static function get_honeypot() {
+		$return = '<input type="text" class="' . self::$honeypot_name . '" name="' .
+			self::$honeypot_name . '[]" value="" autocomplete="off" />
 ';
 
 		return $return;
@@ -1401,7 +1500,7 @@ KEY user_ip (user_ip)
 		$return .= '</style>
 ';
 
-		return apply_filters('twobc_form_security_hp_css', $return);
+		return apply_filters('twobcfs_hp_css', $return);
 	}
 
 	/**
@@ -1413,18 +1512,15 @@ KEY user_ip (user_ip)
 	 */
 	private static function validate_security_fields($location) {
 		// exit conditions - location must be present
-		switch ( true ) {
-			case ( empty($location) ) :
-				return -1;
-
-			default :
-		}
+		if ( empty($location) )
+			return -1;
 
 		$return = true;
 
 		// init reporting array
 		$reporting = array(
-			'ip' => (!empty(self::$plugin_options['record_ips']) && self::validate_ip($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'undefined'),
+			'ip' => ( !empty(self::$plugin_options['record_ips']) && self::validate_ip($_SERVER['REMOTE_ADDR'] ) ?
+				$_SERVER['REMOTE_ADDR'] : 'undefined'),
 			'location' => $location,
 			'honeypot' => false,
 			'recap_null' => false,
@@ -1432,10 +1528,14 @@ KEY user_ip (user_ip)
 		);
 
 		// check the honeypots
-		$hp_name = (empty(self::$plugin_options['honeypot_name']) ? self::$honeypot_name : self::$plugin_options['honeypot_name']);
-		if ( !empty($_REQUEST[$hp_name]) && is_array($_REQUEST[$hp_name]) ) {
-			// remove empty values
-			$honeypots = array_filter($_REQUEST[$hp_name], 'strlen');
+		/* $hp_name = ( empty(self::$plugin_options['honeypot_name'] ) ?
+			self::$honeypot_name : self::$plugin_options['honeypot_name']); */
+		if (
+			!empty($_REQUEST[self::$honeypot_name])
+			&& is_array($_REQUEST[self::$honeypot_name])
+		) {
+			// remove empty values, but leave strings of 0
+			$honeypots = array_filter($_REQUEST[self::$honeypot_name], 'strlen');
 
 			if ( !empty($honeypots) ) {
 				$return = false;
@@ -1447,7 +1547,11 @@ KEY user_ip (user_ip)
 		}
 
 		// check for valid reCAPTCHA response
-		if ( !empty(self::$plugin_options['enable_recaptcha']) && self::recaptcha_has_args() && self::$plugin_options['recaptcha_valid'] ) {
+		if (
+			!empty(self::$plugin_options['enable_recaptcha'])
+			&& self::recaptcha_has_args()
+			&& self::$plugin_options['recaptcha_valid']
+			) {
 			if ( empty($_REQUEST['g-recaptcha-response']) ) {
 				$return = false;
 				$reporting['recap_null'] = true;
@@ -1468,31 +1572,28 @@ KEY user_ip (user_ip)
 
 				if ( !is_wp_error($google_response) ) {
 					$google_response = json_decode($google_response, true);
-				} // TODO: Add debugging messages
 
-				if ( empty($google_response['success']) ) {
-					// detect bad sitekey error
-					if ( !empty($google_response['error-codes']) ) {
-						if (
-							false === strpos($google_response['error-codes'], 'missing-input-secret')
-							&& false === strpos($google_response['error-codes'], 'invalid-input-secret')
-						) {
-							// must be bad response, return false
-							$return = false;
-							$reporting['recap_bad'] = true;
-						} else {
-							// site key is invalid despite api check
-							// make sure to set to false
-							self::$plugin_options['recaptcha_valid'] = '0';
-							self::$plugin_options['enable_recaptcha'] = '0';
-							update_option('twobc_formsecurity_options', self::$plugin_options);
+					if ( empty($google_response['success']) ) {
+						// detect bad sitekey error
+						if ( !empty($google_response['error-codes']) ) {
+							if (
+								false === strpos($google_response['error-codes'], 'missing-input-secret')
+								&& false === strpos($google_response['error-codes'], 'invalid-input-secret')
+							) {
+								// must be bad response, return false
+								$return = false;
+								$reporting['recap_bad'] = true;
+							} else {
+								// site key is invalid despite api check
+								// make sure to disable
+								self::$plugin_options['recaptcha_valid'] = '0';
+								self::$plugin_options['enable_recaptcha'] = '0';
+								update_option('twobc_formsecurity_options', self::$plugin_options);
+							}
 						}
-
 					}
-
-				}
+				} // TODO: Add debugging messages
 			}
-
 		}
 
 		// UPDATE - trigger log update
@@ -1511,21 +1612,14 @@ KEY user_ip (user_ip)
 	 * login_enqueue_scripts hook - load captcha api and plugin style
 	 */
 	public static function hook_login_enqueue_scripts() {
-		if ( !empty(self::$plugin_options['display_login']) ) {
-			wp_enqueue_script(
-				'twobc_formsecurity_captcha', // handle
-				'https://www.google.com/recaptcha/api.js', //src
-				array(), // dependencies
-				self::$plugin_version, // version
-				false // in footer
-			);
+		if (
+			!empty(self::$plugin_options['display_login'])
+			&& !empty(self::$plugin_options['enable_recaptcha'])
+			&& !empty(self::$plugin_options['recaptcha_valid'])
+		) {
+			wp_enqueue_script('twobc_formsecurity_captcha');
 
-			wp_enqueue_style(
-				'twobc_formsecurity_captcha_style', // handle
-				self::$plugin_url . 'includes/css/2bc-form-security.css', // URL src
-				array(), // dependencies
-				self::$plugin_version // version
-			);
+			wp_enqueue_style('twobc_formsecurity_captcha_style');
 
 		}
 	}
@@ -1534,23 +1628,23 @@ KEY user_ip (user_ip)
 	 * login_head hook - display honeypot CSS
 	 */
 	public static function hook_login_head() {
-		if ( !empty(self::$plugin_options['display_login']) ) {
-			echo self::get_honeypot_css();
-		}
+		echo self::get_honeypot_css();
 	}
 
 	/**
 	 * login_form hook - get the reCAPTCHA and Honeypot markup for the login form
 	 */
 	public static function hook_login_form() {
-		if ( !empty(self::$plugin_options['display_login']) ) {
+		// honeypot
+		echo self::get_honeypot();
 
-			// recaptcha
-			if ( !empty(self::$plugin_options['enable_recaptcha']) )
-				echo self::get_recaptcha_div();
-
-			// honeypot
-			echo self::get_honeypot();
+		// recaptcha
+		if (
+			!empty(self::$plugin_options['display_login'])
+			&& !empty(self::$plugin_options['enable_recaptcha'])
+			&& !empty(self::$plugin_options['recaptcha_valid'])
+		) {
+			echo self::get_recaptcha_div();
 		}
 	}
 
@@ -1584,14 +1678,16 @@ KEY user_ip (user_ip)
 	 * register_form hook - get reCAPTCHA and Honeypot markup for the registration form
 	 */
 	public static function hook_register_form() {
-		if ( !empty(self::$plugin_options['display_register']) ) {
+		// honeypot
+		echo self::get_honeypot();
 
-			// recaptcha
-			if ( !empty(self::$plugin_options['enable_recaptcha']) )
-				echo self::get_recaptcha_div();
-
-			// honeypot
-			echo self::get_honeypot();
+		// recaptcha
+		if (
+			!empty(self::$plugin_options['display_register'])
+			&& !empty(self::$plugin_options['enable_recaptcha'])
+			&& !empty(self::$plugin_options['recaptcha_valid'])
+		) {
+			echo self::get_recaptcha_div();
 		}
 	}
 
@@ -1608,7 +1704,8 @@ KEY user_ip (user_ip)
 		$validated = self::validate_security_fields('register');
 
 		if ( !$validated && !isset($errors->errors['twobc_form_security']) ) {
-				$errors->add('twobc_form_security', wp_kses_post(__('<strong>ERROR:</strong> Security checks failed', '2bc-form-security')));
+				$errors->add('twobc_form_security',
+					wp_kses_post(__('<strong>ERROR:</strong> Security checks failed', '2bc-form-security')));
 		}
 
 		return $errors;
@@ -1621,15 +1718,13 @@ KEY user_ip (user_ip)
 	 * wp_enqueue_scripts hook - add reCAPTCHA api and plugin styling
 	 */
 	public static function hook_wp_enqueue_scripts() {
-		// add recaptcha api settings are appropriate
-		if ( !empty(self::$plugin_options['display_comment']) && comments_open() ) {
-			wp_enqueue_script(
-				'twobc_formsecurity_captcha', // handle
-				'https://www.google.com/recaptcha/api.js', //src
-				array(), // dependencies
-				self::$plugin_version, // version
-				true // in footer
-			);
+		// WP Comments
+		if (
+			(!empty(self::$plugin_options['display_comment']) && comments_open())
+			&& !empty(self::$plugin_options['enable_recaptcha'])
+			&& !empty(self::$plugin_options['recaptcha_valid'])
+		) {
+			wp_enqueue_script('twobc_formsecurity_captcha');
 
 			wp_enqueue_style(
 				'twobc_formsecurity_style', // handle
@@ -1639,13 +1734,15 @@ KEY user_ip (user_ip)
 				false // in footer
 			);
 		}
+
+
 	}
 
 	/**
 	 * wp_head hook - display honeypot CSS when comment form is going to be present
 	 */
 	public static function hook_wp_head() {
-		if ( !empty(self::$plugin_options['display_comment']) && comments_open() ) {
+		if ( comments_open() ) {
 			echo self::get_honeypot_css();
 		}
 	}
@@ -1654,14 +1751,15 @@ KEY user_ip (user_ip)
 	 * comment_form hook - display reCAPTCHA and Honeypot markup on the comment form
 	 */
 	public static function hook_comment_form() {
-		if ( !empty(self::$plugin_options['display_comment']) ) {
+		// honeypot
+		echo self::get_honeypot();
 
-			// recaptcha
-			if ( !empty(self::$plugin_options['enable_recaptcha']) )
-				echo self::get_recaptcha_div();
-
-			// honeypot
-			echo self::get_honeypot();
+		if (
+			!empty(self::$plugin_options['display_comment'])
+			&& !empty(self::$plugin_options['enable_recaptcha'])
+			&& !empty(self::$plugin_options['recaptcha_valid'])
+		) {
+			echo self::get_recaptcha_div();
 		}
 	}
 
@@ -1767,7 +1865,8 @@ KEY user_ip (user_ip)
  style="display:inline-block;width:47%;padding:0 1%;vertical-align:top;">
 ';
 
-		$output .= '	<h4><a href="' . add_query_arg(array('tab' => 'reports'), $admin_url) . '">' . esc_html(__('Report Summary', '2bc-form-security')) . '</a></h4>
+		$output .= '	<h4><a href="' . add_query_arg(array('tab' => 'reports'), $admin_url) . '">'
+			. esc_html(__('Report Summary', '2bc-form-security')) . '</a></h4>
 ';
 
 		$total = $wpdb->get_var(
@@ -1776,7 +1875,8 @@ KEY user_ip (user_ip)
 		);
 		$output .= '	<ul class="first_instance">
 ';
-		$output .= '		<li>' . sprintf(wp_kses_post(__('Total events: %s', '2bc-form-security')), '<span>' . number_format($total)) . '</span></li>
+		$output .= '		<li>' . sprintf(wp_kses_post(__('Total events: %s', '2bc-form-security')), '<span>'
+			. number_format($total)) . '</span></li>
 ';
 		$output .= '	</ul>
 ';
@@ -1789,7 +1889,8 @@ KEY user_ip (user_ip)
 			FROM $wpdb->twobc_formsecurity_log"
 		);
 
-		$output .= '		<li>' . sprintf(wp_kses_post(__('Honeypot events: %s', '2bc-form-security')), '<span>' . number_format($honeypot)) . '</span></li>
+		$output .= '		<li>' . sprintf(wp_kses_post(__('Honeypot events: %s', '2bc-form-security')), '<span>'
+			. number_format($honeypot)) . '</span></li>
 ';
 
 		$recapt_null = $wpdb->get_var(
@@ -1797,14 +1898,16 @@ KEY user_ip (user_ip)
 			FROM $wpdb->twobc_formsecurity_log"
 		);
 
-		$output .= '		<li>' . sprintf(wp_kses_post(__('reCAPTCHA | null: %s', '2bc-form-security')), '<span>' . number_format($recapt_null)) . '</span></li>
+		$output .= '		<li>' . sprintf(wp_kses_post(__('reCAPTCHA | null: %s', '2bc-form-security')), '<span>'
+			. number_format($recapt_null)) . '</span></li>
 ';
 
 		$recapt_bad = $wpdb->get_var(
 			"SELECT sum(register_rcp_bad+login_rcp_bad+comment_rcp_bad)
 			FROM $wpdb->twobc_formsecurity_log"
 		);
-		$output .= '		<li>' . sprintf(wp_kses_post(__('reCAPTCHA | bad: %s', '2bc-form-security')), '<span>' . number_format($recapt_bad)) . '</span></li>
+		$output .= '		<li>' . sprintf(wp_kses_post(__('reCAPTCHA | bad: %s', '2bc-form-security')), '<span>'
+			. number_format($recapt_bad)) . '</span></li>
 ';
 
 		$output .= '	</ul>
@@ -1817,21 +1920,23 @@ KEY user_ip (user_ip)
 			"SELECT sum(register_hp+register_rcp_null+register_rcp_bad)
 			FROM $wpdb->twobc_formsecurity_log"
 		);
-		$output .= '		<li>' . sprintf(wp_kses_post(__('Registration form: %s', '2bc-form-security')), '<span>' . number_format($reg_form)) . '</span></li>
-';
+		$output .= '		<li>' . sprintf(wp_kses_post(__('Registration form: %s', '2bc-form-security')), '<span>'
+			. number_format($reg_form)) . '</span></li>';
 
 		$login_form = $wpdb->get_var(
 			"SELECT sum(login_hp+login_rcp_null+login_rcp_bad)
 			FROM $wpdb->twobc_formsecurity_log"
 		);
-		$output .= '		<li>' . sprintf(wp_kses_post(__('Login form: %s', '2bc-form-security')), '<span>' . number_format($login_form)) . '</span></li>
+		$output .= '		<li>' . sprintf(wp_kses_post(__('Login form: %s', '2bc-form-security')), '<span>'
+			. number_format($login_form)) . '</span></li>
 ';
 
 		$comment_form = $wpdb->get_var(
 			"SELECT sum(comment_hp+comment_rcp_null+comment_rcp_bad)
 			FROM $wpdb->twobc_formsecurity_log"
 		);
-		$output .= '		<li>' . sprintf(wp_kses_post(__('Comment form: %s', '2bc-form-security')), '<span>' . number_format($comment_form)) . '</span></li>
+		$output .= '		<li>' . sprintf(wp_kses_post(__('Comment form: %s', '2bc-form-security')), '<span>'
+			. number_format($comment_form)) . '</span></li>
 ';
 		$output .= '	</ul>
 ';
@@ -1840,7 +1945,8 @@ KEY user_ip (user_ip)
 
 		$output .= '<div class="twobc_formsec_widget_col col_2" style="display:inline-block;width:47%;padding:0 1%;vertical-align:top;">
 ';
-		$output .= '	<h4><a href="' . add_query_arg(array('tab' => 'settings'), $admin_url) . '">' . esc_html(__('Current Settings', '2bc-form-security')) . '</a></h4>
+		$output .= '	<h4><a href="' . add_query_arg(array('tab' => 'settings'), $admin_url)
+			. '">' . esc_html(__('Current Settings', '2bc-form-security')) . '</a></h4>
 ';
 		$output .= '		<ul>
 ';
@@ -1849,13 +1955,20 @@ KEY user_ip (user_ip)
 		$i18n_no = esc_html(__('No', '2bc-form-security'));
 
 		$widget_settings = array(
-			'enable_recaptcha' => sprintf(wp_kses_post(__('reCAPTCHA enabled: %s', '2bc-form-security')), '<span>' . (  !empty(self::$plugin_options['enable_recaptcha']) ? $i18n_yes : $i18n_no )) . '</span>',
-			'recaptcha_valid' => sprintf(wp_kses_post(__('reCAPTCHA valid: %s', '2bc-form-security')), '<span>' . (  !empty(self::$plugin_options['recaptcha_valid']) ? $i18n_yes : $i18n_no )) . '</span>',
-			'display_register' => sprintf(wp_kses_post(__('Register form: %s', '2bc-form-security')), '<span>' . (  !empty(self::$plugin_options['display_register']) ? $i18n_yes : $i18n_no )) . '</span>',
-			'display_login' => sprintf(wp_kses_post(__('Login form: %s', '2bc-form-security')), '<span>' . (  !empty(self::$plugin_options['display_login']) ? $i18n_yes : $i18n_no )) . '</span>',
-			'display_comment' => sprintf(wp_kses_post(__('Comment form: %s', '2bc-form-security')), '<span>' . (  !empty(self::$plugin_options['display_comment']) ? $i18n_yes : $i18n_no )) . '</span>',
-			'record_ips' => sprintf(wp_kses_post(__('Record IPs: %s', '2bc-form-security')), '<span>' . (  !empty(self::$plugin_options['record_ips']) ? $i18n_yes : $i18n_no )) . '</span>',
-			'enable_reporting' => sprintf(wp_kses_post(__('Reporting Enabled: %s', '2bc-form-security')), '<span>' . (  !empty(self::$plugin_options['enable_reporting']) ? $i18n_yes : $i18n_no )) . '</span>',
+			'enable_recaptcha' => sprintf(wp_kses_post(__('reCAPTCHA enabled: %s', '2bc-form-security')), '<span>' .
+				(  !empty(self::$plugin_options['enable_recaptcha']) ? $i18n_yes : $i18n_no )) . '</span>',
+			'recaptcha_valid' => sprintf(wp_kses_post(__('reCAPTCHA valid: %s', '2bc-form-security')), '<span>' .
+				(  !empty(self::$plugin_options['recaptcha_valid']) ? $i18n_yes : $i18n_no )) . '</span>',
+			'display_register' => sprintf(wp_kses_post(__('Register form: %s', '2bc-form-security')), '<span>' .
+				(  !empty(self::$plugin_options['display_register']) ? $i18n_yes : $i18n_no )) . '</span>',
+			'display_login' => sprintf(wp_kses_post(__('Login form: %s', '2bc-form-security')), '<span>' .
+				(  !empty(self::$plugin_options['display_login']) ? $i18n_yes : $i18n_no )) . '</span>',
+			'display_comment' => sprintf(wp_kses_post(__('Comment form: %s', '2bc-form-security')), '<span>' .
+				(  !empty(self::$plugin_options['display_comment']) ? $i18n_yes : $i18n_no )) . '</span>',
+			'record_ips' => sprintf(wp_kses_post(__('Record IPs: %s', '2bc-form-security')), '<span>' .
+				(  !empty(self::$plugin_options['record_ips']) ? $i18n_yes : $i18n_no )) . '</span>',
+			'enable_reporting' => sprintf(wp_kses_post(__('Reporting Enabled: %s', '2bc-form-security')), '<span>'
+				. (  !empty(self::$plugin_options['enable_reporting']) ? $i18n_yes : $i18n_no )) . '</span>',
 		);
 
 		foreach ($widget_settings as $_setting_name => $_setting_title) {
@@ -2014,6 +2127,14 @@ KEY user_ip (user_ip)
 		return $class;
 	}
 
+	/**
+	 * Get correct admin URL, works with of multi-site
+	 * Optionally add query args to URL
+	 *
+	 * @param string $path
+	 * @param array $query_args
+	 * @return string
+	 */
 	private static function get_admin_url($path = '', $query_args = array()) {
 		$admin_url = ( !is_multisite() ? admin_url($path) : network_admin_url($path) );
 
@@ -2061,7 +2182,8 @@ KEY user_ip (user_ip)
 		if ( empty($site_key) || empty($secret_key) )
 			die(esc_html(__('Google reCAPTCHA API keys missing or invalid.', '2bc-form-security')));
 
-		$response = ( !empty($_REQUEST['twobcfsRecaptchaResponse']) ? esc_attr($_REQUEST['twobcfsRecaptchaResponse']) : false );
+		$response = ( !empty($_REQUEST['twobcfsRecaptchaResponse']) ?
+			esc_attr($_REQUEST['twobcfsRecaptchaResponse']) : false );
 
 		if ( empty($response) )
 			die(esc_html(__('Google reCAPTCHA not clicked.', '2bc-form-security')));
@@ -2083,7 +2205,70 @@ KEY user_ip (user_ip)
 			$return = $return->get_error_message();
 		}
 
+		// cleaning out any notices or errors from debug mode
+		ob_clean();
 		die($return);
+	}
+
+	/*************************************************
+	 * BuddyPress
+	 ************************************************/
+	/**
+	 * Add BuddyPress functionality - Registration Form
+	 */
+
+	/**
+	 * BuddyPress flag
+	 */
+	public static function hook_buddypress() {
+		self::$buddypress = true;
+	}
+
+	/**
+	 * Honeypot CSS
+	 */
+	public static function hook_bp_head() {
+		if ( function_exists('bp_is_register_page') && bp_is_register_page() ) {
+			echo self::get_honeypot_css();
+		}
+	}
+
+	/**
+	 * Enqueue CAPTCHA style and script
+	 */
+	public static function hook_bp_enqueue_scripts() {
+		if (
+			(function_exists('bp_is_register_page') && bp_is_register_page())
+			&& !empty(self::$plugin_options['display_register'])
+			&& !empty(self::$plugin_options['enable_recaptcha'])
+			&& !empty(self::$plugin_options['recaptcha_valid'])
+		) {
+			wp_enqueue_script('twobc_formsecurity_captcha');
+			wp_enqueue_style('twobc_formsecurity_captcha_style');
+		}
+	}
+
+	/**
+	 * Add security fields after submit button
+	 */
+	public static function hook_bp_after_submit() {
+		// honeypot
+		echo self::get_honeypot();
+
+		if ( !empty(self::$plugin_options['display_register']) ) {
+			echo self::get_recaptcha_div(true, true);
+		}
+	}
+
+	/**
+	 * Check security fields
+	 */
+	public static function hook_bp_signup_validate() {
+
+		if ( false === self::validate_security_fields('register') ) {
+			global $bp;
+			$bp->signup->errors['signup_username'] = __('Security checks failed.', '2bc-form-security');
+		}
 	}
 
 } // end of class 2bc_form_security

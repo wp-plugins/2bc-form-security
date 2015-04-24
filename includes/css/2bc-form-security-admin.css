@@ -238,6 +238,14 @@ filter(alpha(opacity=100));
 	background: #EFF1FF;
 }
 
+/** BuddyPress styling **/
+#twobc_formsecurity_options_wrap .options_flag_buddypress {
+	
+}
+#twobc_formsecurity_options_wrap .options_flag_buddypress img {
+	vertical-align: middle;
+}
+
 /*** responsive CSS ***/
 @media (max-width: 1440px) {
 	#twobc_formsecurity_options_wrap .twobc_formsecurity_options_reports li span,

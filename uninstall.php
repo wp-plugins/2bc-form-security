@@ -5,6 +5,7 @@
  * @see http://codex.wordpress.org/Function_Reference/register_uninstall_hook
  *
  * @package WordPress
+ * @subpackage 2BC-Form-Security
  */
 
 //if uninstall not called from WordPress - exit
