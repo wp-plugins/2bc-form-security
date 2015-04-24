@@ -3,7 +3,7 @@
  * Plugin Name: 2BC Form Security
  * Plugin URI: http://2bcoding.com/plugins/2bc-form-security/
  * Description: Increase security and reduce spam by adding a honeypot and Google reCAPTCHA V2 to the log in form, registration form, and comment form
- * Version: 2.0.0
+ * Version: 2.0.1
  * Author: 2BCoding
  * Author URI: http://2bcoding.com/
  * Text Domain: 2bc-form-security
@@ -99,7 +99,7 @@ add_action('bp_signup_validate', array($core, 'hook_bp_signup_validate'));
  */
 class twobc_form_security {
 	private static $instance = null;
-	private static $plugin_version = '2.0.0';
+	private static $plugin_version = '2.0.1';
 	private static $plugin_options;
 	private static $plugin_url;
 	private static $plugin_path;
