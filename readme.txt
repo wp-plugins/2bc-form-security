@@ -5,7 +5,7 @@ Tags: 2bc, 2bcoding, google, recaptcha, captcha, nocaptcha, integration, honeypo
 Author URI: http://2bcoding.com/
 Plugin URI: http://2bcoding.com/plugins/2bc-form-security/
 Requires at least: 3.6
-Tested up to: 4.2
+Tested up to: 4.2.1
 Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
